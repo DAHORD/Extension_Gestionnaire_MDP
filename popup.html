@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>DaVaultHord</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+    <div id="lock-view" class="view">
+        <h1 class="title lock-title"> 
+            <img src="icons/icon48.png" alt="ModernVault Logo" class="app-logo"> 
+            DaVaultHord
+        </h1>
+        <div class="input-group">
+            <input type="password" id="master-password-input" placeholder="Mot de passe Maître" autofocus>
+        </div>
+        <button id="unlock-button" class="button-primary">Déverrouiller / Configurer</button>
+        <p id="lock-status" class="status"></p>
+    </div>
+
+    <div id="main-view" class="view hidden">
+        <div class="header">
+          <h1 class="title lock-title"> 
+            <img src="icons/icon48.png" alt="ModernVault Logo" class="app-logo"> 
+            Mon Coffre-Fort
+          </h1>
+            <div class="header-actions">
+               <button id="settings-button" class="button-icon" title="Paramètres">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></svg>
+        </button>
+                <button id="lock-now-button" class="button-icon" title="Verrouiller maintenant">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h1v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-2 0H8V6c0-2.21 1.79-4 4-4s4 1.79 4 4v2z"/></svg>
+                </button>
+            </div>
+        </div>
+        <input type="search" id="search-input" placeholder="Rechercher..." class="search-bar">
+
+        <div id="suggestion-banner" class="suggestion-banner hidden">
+            <p>Nouvel identifiant détecté. Voulez-vous l'enregistrer ?</p>
+            <button id="add-suggested-button" class="button-primary">Ajouter</button>
+        </div>
+        
+        <div id="credentials-list" class="list">
+        </div>
+        <div class="actions-footer">
+            <button id="add-new-button" class="button-secondary">Ajouter manuellement</button>
+            <button id="show-generator-button" class="button-secondary">Générateur</button>
+        </div>
+    </div>
+    
+    <div id="edit-view" class="view hidden">
+        <div class="header">
+            <h1 id="edit-view-title" class="title">Ajouter un identifiant</h1>
+            <button id="cancel-edit-button" class="button-icon" title="Annuler">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+        <div class="input-group">
+            <label for="edit-name">Nom (ex: Mon compte Google)</label>
+            <input type="text" id="edit-name" placeholder="Nom descriptif">
+        </div>
+        <div class="input-group">
+            <label for="edit-site">Site (ex: google.com)</label>
+            <input type="text" id="edit-site" placeholder="site.com">
+        </div>
+        <div class="input-group">
+            <label for="edit-username">Nom d'utilisateur</label>
+            <input type="text" id="edit-username" placeholder="votre@email.com ou votre_pseudo">
+        </div>
+        <div class="input-group password-input-group">
+            <label for="edit-password">Mot de passe</label>
+            <input type="password" id="edit-password" placeholder="votre mot de passe">
+            <button type="button" id="toggle-edit-password-visibility" class="button-icon" title="Afficher/Masquer le mot de passe">
+                <svg viewBox="0 0 24 24" class="icon-toggle-password">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+            </button>
+        </div>
+        <div class="input-group">
+            <label for="edit-notes">Notes (optionnel)</label>
+            <textarea id="edit-notes" placeholder="Notes supplémentaires..."></textarea>
+        </div>
+        <p id="edit-status" class="status"></p>
+        <div class="form-actions">
+            <button id="save-credential-button" class="button-primary">Enregistrer</button>
+        </div>
+    </div>
+
+    <div id="generator-view" class="view hidden">
+        <div class="header">
+            <h1 class="title">Générateur de mot de passe</h1>
+            <button id="back-from-generator-button" class="button-icon" title="Retour">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
+        </div>
+        <input type="text" id="generated-password" readonly placeholder="Mot de passe généré">
+        <button id="copy-generated-button" class="button-secondary">Copier</button>
+
+        <div class="input-group">
+            <label>Type de génération:</label>
+            <div class="radio-group">
+                <input type="radio" id="type-password" name="gen-type" value="password" checked>
+                <label for="type-password">Mot de passe</label>
+                <input type="radio" id="type-passphrase" name="gen-type" value="passphrase">
+                <label for="type-passphrase">Phrase de passe</label>
+            </div>
+        </div>
+        <div class="options">
+            <label id="length-label-container">Longueur: <span id="length-label">16</span></label>
+            <input type="range" id="length-slider" min="8" max="64" value="16">
+            
+            <div id="password-options">
+                <label><input type="checkbox" id="include-uppercase" checked> ABC</label>
+                <label><input type="checkbox" id="include-numbers" checked> 123</label>
+                <label><input type="checkbox" id="include-symbols" checked> #$&</label>
+            </div>
+            </div>
+        <div class="form-actions">
+            <button id="regenerate-button" class="button-primary">Générer</button>
+        </div>
+    </div>
+
+    <div id="settings-view" class="view hidden">
+        <div class="header">
+           <h1 class="title lock-title"> 
+            <img src="icons/icon48.png" alt="ModernVault Logo" class="app-logo"> 
+            Paramètres
+           </h1>
+            <button id="back-from-settings-button" class="button-icon" title="Retour">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+            </button>
+        </div>
+        <p id="settings-status" class="status"></p>
+
+        <div class="settings-section">
+            <h2>Gestion du Coffre-fort</h2>
+            <button id="change-master-password-button" class="button-secondary">Changer le mot de passe maître</button>
+            <button id="export-vault-button" class="button-secondary">Exporter le coffre-fort</button>
+            <button id="import-vault-button" class="button-secondary">Importer le coffre-fort</button>
+            <input type="file" id="import-vault-input" accept=".json" class="hidden">
+        </div>
+        
+    </div>
+    
+    <template id="credential-item-template">
+        <div class="list-item" data-id="">
+            <div class="item-info">
+                <img class="item-favicon" src="" alt="Favicon">
+                <div class="item-text">
+                    <span class="item-name"></span>
+                    <span class="item-username"></span>
+                    <span class="item-site"></span>
+                </div>
+            </div>
+            <div class="item-actions">
+                <button class="button-icon copy-password" title="Copier le mot de passe">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16 1H4C2.9 1 2 1.9 2 3v14h2V3h12V1zm3 4H8C6.9 5 6 5.9 6 7v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+                </button>
+                <button class="button-icon fill-credential" title="Remplir l'identifiant">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 8l9 9 9-9H3z"/></svg>
+                </button>
+                <button class="button-icon edit-credential" title="Modifier">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L18.79 9.96l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                </button>
+                <button class="button-icon delete-credential" title="Supprimer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5L13 2H9.5L7 4H5v2h14V4z"/></svg>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <script src="crypto.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
